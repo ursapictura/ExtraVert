@@ -238,7 +238,7 @@ void AdoptPlant()
     {
         if (plants[i].Sold == false && plants[i].AvailableUntil > DateTime.Now)
         {
-        Console.WriteLine($"{i + 1}. A {plants[i].Species} in {plants[i].City} is avilable for ${plants[i].AskingPrice}");
+        Console.WriteLine($"{i + 1}. A {PlantDetails(plants[i])}");
         }
     }
     int userChoice = Int32.Parse(Console.ReadLine()) - 1;
@@ -256,7 +256,7 @@ void DelistPlant()
 
     for (int i = 0; i < plants.Count; i++)
     {
-        Console.WriteLine($"{i + 1}. A {plants[i].Species} in {plants[i].City} is avilable for ${plants[i].AskingPrice}");
+        Console.WriteLine($"{i + 1}. A {PlantDetails(plants[i])}");
     }
 
     int userChoice = Int32.Parse(Console.ReadLine());
@@ -297,4 +297,11 @@ void GetStats ()
     Console.WriteLine($"Number of plants with the highest light needs: {plants.Where(p => p.LightNeeds > 4).ToList().Count} ");
     Console.WriteLine($"Average light needs of all listed plants: {plants.Average(p => p.LightNeeds)}");
     Console.WriteLine($"Percentage of adopted plants: {(decimal)(plants.Where(p => p.Sold!).ToList().Count) / plants.Count * 100}%");
+}
+
+string PlantDetails(Plant plant)
+{
+    string plantString = $"{plant.Species} in {plant.City} {(plant.Sold ? "sold" : "available")} for {plant.AskingPrice}";
+
+    return plantString;
 }
