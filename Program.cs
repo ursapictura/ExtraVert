@@ -12,7 +12,7 @@ List<Plant> plants = new List<Plant>()
         AskingPrice = 20.00M,
         City = "New York",
         Sold = false,
-        AvailableUntil = "08/12/2024"
+        AvailableUntil = new DateTime(2024, 08, 05)
     },
 
     new Plant()
@@ -22,7 +22,7 @@ List<Plant> plants = new List<Plant>()
         AskingPrice = 10.75M,
         City = "Nashville",
         Sold = false,
-        AvailableUntil = "09/24/2024"
+        AvailableUntil = new DateTime(2024, 09, 24)
     },
 
     new Plant()
@@ -32,7 +32,7 @@ List<Plant> plants = new List<Plant>()
         AskingPrice = 15.50M,
         City = "Santa Fe",
         Sold = false,
-        AvailableUntil = "05/23/2024"
+        AvailableUntil = new DateTime(2024, 11, 24)
     },
 
     new Plant()
@@ -42,7 +42,7 @@ List<Plant> plants = new List<Plant>()
         AskingPrice = 25.00M,
         City = "Greensboro",
         Sold = true,
-        AvailableUntil = "05/08/2024"
+        AvailableUntil = new DateTime(2025, 05, 04)
     },
 
     new Plant()
@@ -52,7 +52,7 @@ List<Plant> plants = new List<Plant>()
         AskingPrice = 5.99M,
         City = "Chicago",
         Sold = false,
-        AvailableUntil = "12/09/2024"
+        AvailableUntil = new DateTime(2024, 06, 24)
     }
 
 };
@@ -79,7 +79,8 @@ while (choice != "0")
 3. Adopt a plant
 4. Delist a plant
 5. Display plant of the day
-6. Search for plants by light needs");
+6. Search for plants by light needs
+7. Show stats for listed plants");
 
     choice = Console.ReadLine();
     if (choice == "0")
@@ -113,6 +114,10 @@ while (choice != "0")
     {
         SearchByLightNeeds();
     }
+    else if (choice == "7")
+    {
+        GetStats();
+    }
     else 
     {
         Console.Clear();
@@ -135,7 +140,7 @@ void PostPlant()
     decimal userAskingPrice = 0;
     string userCity = null;
     int userZIP = 0;
-    string dateString = null;
+    DateTime userDate = DateTime.MinValue;
 
     while (string.IsNullOrEmpty(userSpecies))
     {
@@ -181,15 +186,19 @@ void PostPlant()
         }
     };
 
-    while (string.IsNullOrEmpty(dateString))
+    while (userDate == DateTime.MinValue)
     {
-        Console.WriteLine("How long would you like your plant listed? Please tell us in the mm/dd/yyyy format!");
-        dateString = Console.ReadLine();
-    };
+        Console.WriteLine("How long would you like your plant listed? Please tell us in the yyyy/mm/dd format!");
 
-    string format = "MM/dd/yyyy";
-    DateTime.TryParseExact(dateString, format, new CultureInfo("en-US"), DateTimeStyles.None, out DateTime userDate);
-    Console.WriteLine(userDate);
+        if (DateTime.TryParse(Console.ReadLine(), out userDate))
+        {
+            Console.WriteLine(userDate);
+            break;
+        }
+        else{
+            Console.WriteLine("I'm sorry, that date is invalid. Please enter a new date in the yyyy/mm/dd format.");
+        }
+    };
 
     string userAnswer = null;
     while (userAnswer == null)
@@ -211,7 +220,7 @@ void PostPlant()
                 City = userCity,
                 ZIP = userZIP,
                 Sold = false,
-                AvailableUntil = userDate.ToString(),
+                AvailableUntil = userDate,
             });
         }
         else
@@ -227,7 +236,7 @@ void AdoptPlant()
     Console.WriteLine("Here are our available plants. Which would you like to adopt?");
     for (int i = 0; i < plants.Count; i++)
     {
-        if (plants[i].Sold == false && DateTime.Parse(plants[i].AvailableUntil) > DateTime.Now)
+        if (plants[i].Sold == false && plants[i].AvailableUntil > DateTime.Now)
         {
         Console.WriteLine($"{i + 1}. A {plants[i].Species} in {plants[i].City} is avilable for ${plants[i].AskingPrice}");
         }
@@ -278,4 +287,14 @@ void SearchByLightNeeds()
             Console.WriteLine($"{i + 1}. The {plants[i].Species} in {plants[i].City} has a light need of {plants[i].LightNeeds}");
         }
     }
+}
+
+void GetStats ()
+{
+    Console.Clear();
+    Console.WriteLine($"Lowest price plant: {plants.Min(p => p.AskingPrice)}");
+    Console.WriteLine($"Number of available plants: {plants.Where(p => p.Sold == false).ToList().Count}");
+    Console.WriteLine($"Number of plants with the highest light needs: {plants.Where(p => p.LightNeeds > 4).ToList().Count} ");
+    Console.WriteLine($"Average light needs of all listed plants: {plants.Average(p => p.LightNeeds)}");
+    Console.WriteLine($"Percentage of adopted plants: {(decimal)(plants.Where(p => p.Sold!).ToList().Count) / plants.Count * 100}%");
 }
